@@ -31,17 +31,60 @@ int main(void)
 	GPIOx_MODER_t *GPIOD_MODER = (GPIOx_MODER_t*)(0x40020C00);
 	GPIOx_ODR_t   *GPIOD_ODR   = (GPIOx_ODR_t*)  (0x40020C00 + 0x14);
 
-	// Enable GPIOD
+	GPIOx_MODER_t *GPIOA_MODER     = (GPIOx_MODER_t*)(0x40020000);
+	GPIOx_IDR_t const *GPIOA_IDR   = (GPIOx_IDR_t*)  (0x40020000 + 0x10);
+
+	// Enable GPIO
 	RCC_AHB1ENR->GPIODEN = 1;
+	RCC_AHB1ENR->GPIOAEN = 1;
 
-	// PD15 = Blue User LED
-	GPIOD_MODER->MODER15 = 0b01; // Output Mode
-	GPIOD_ODR->ODR15 = 1;
+	// Setting as Output Mode
+	GPIOD_MODER->MODER15 = 0b01; // Blue   LED
+	GPIOD_MODER->MODER13 = 0b01; // Orange LED
+	GPIOD_MODER->MODER12 = 0b01; // Green  LED
+	GPIOD_MODER->MODER14 = 0b01; // Red    LED
 
+	// PA0 = User Button
+	GPIOA_MODER->MODER0 = 0b00; // Input Mode
+
+	uint8_t mode = 0;
 	while (1)
 	{
+		if(GPIOA_IDR->IDR0 == 1)
+		{
+			mode = (mode + 1) % 4;
+		}
+
 		for(int volatile i = 0; i<500000; ++i);
-		GPIOD_ODR->ODR15 ^= 1;
+		// GPIOD_ODR->ODR15 ^= 1;
+
+		switch (mode)
+		{
+			case 0: // Orange
+				GPIOD_ODR->ODR15 = 0;
+				GPIOD_ODR->ODR13 ^= 1;
+				GPIOD_ODR->ODR12 = 0;
+				GPIOD_ODR->ODR14 = 0;
+				break;
+			case 1: // Green
+				GPIOD_ODR->ODR15 = 0;
+				GPIOD_ODR->ODR13 = 0;
+				GPIOD_ODR->ODR12 ^= 1;
+				GPIOD_ODR->ODR14 = 0;
+				break;
+			case 2: // Red
+				GPIOD_ODR->ODR15 = 0;
+				GPIOD_ODR->ODR13 = 0;
+				GPIOD_ODR->ODR12 = 0;
+				GPIOD_ODR->ODR14 ^= 1;
+				break;
+			case 3: // Blue
+				GPIOD_ODR->ODR15 ^= 1;
+				GPIOD_ODR->ODR13 = 0;
+				GPIOD_ODR->ODR12 = 0;
+				GPIOD_ODR->ODR14 = 0;
+				break;
+		}
 
 	};
 }
