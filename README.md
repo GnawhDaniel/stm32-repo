@@ -1,5 +1,4 @@
 # STM32 Mini-Project Milestones
----
 A collection of small, focused projects to mark key checkpoints in my learning journey as an **embedded software engineer**.
 ## Hardware ⚙️
 - **Board**: [STM32F407G-DISC1](https://www.st.com/en/evaluation-tools/stm32f4discovery.html) 
